@@ -1,4 +1,3 @@
-const { Mongoose } = require('mongoose');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const mongoose = require('mongoose');
@@ -25,25 +24,23 @@ passport.use(
             callbackURL: '/auth/google/callback',
             proxy: true
         },
-        (accessToken, refreshToken, profile, done) => {
+        async (accessToken, refreshToken, profile, done) => {
+            const existingUser = await User.findOne({ googleId: profile.id });
 
-            User.findOne({ googleId: profile.id })
-                .then((existingUser) => {
-                    if (existingUser) {
-                        // We already have a record with the given profile ID
-                        done(null, existingUser);
-                    } else {
-                        // We do not have a user record with this ID, make a new record
-                        new User({ googleId: profile.id })
-                            .save()
-                            .then(user => done(null, user));
-
-                    }
-
-                });
+            if (existingUser) {
+                // We already have a record with the given profile ID
+                return done(null, existingUser);
+            }
+            // We do not have a user record with this ID, make a new record
+            const use = await new User({ googleId: profile.id }).save()
+            done(null, user);
 
 
 
         }
+
+
+
+
     )
 );
