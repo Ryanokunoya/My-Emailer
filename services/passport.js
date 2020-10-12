@@ -11,7 +11,7 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser((id, done) => {
-    User.findById(id).then(User => {
+    User.findById(id).then(user => {
         done(null, user);
     });
 });
@@ -32,7 +32,7 @@ passport.use(
                 return done(null, existingUser);
             }
             // We do not have a user record with this ID, make a new record
-            const use = await new User({ googleId: profile.id }).save()
+            const user = await new User({ googleId: profile.id }).save()
             done(null, user);
 
 
